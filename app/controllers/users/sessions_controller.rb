@@ -43,11 +43,13 @@ class Users::SessionsController < Devise::SessionsController
     return @authrized_passkey = nil unless parsed_credential
 
     webauthn_credential = WebAuthn::Credential.from_get(parsed_credential)
+    # credential IDから対応するパスキーを検索
     passkey = Passkey.find_by(external_id: webauthn_credential.id)
     return @authrized_passkey = nil unless passkey
 
     stored_authentication_challenge = session[:current_webauthn_authentication_challenge]
 
+    # パスキーの検証
     verified = webauthn_credential.verify(
       stored_authentication_challenge,
       public_key: passkey.public_key,

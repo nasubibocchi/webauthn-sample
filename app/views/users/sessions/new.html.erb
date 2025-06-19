@@ -5,10 +5,14 @@
   'authorize-passkey-request-options-url-value': request_options_path
 } do %>
 
+  <div class="passkey-info">
+    <p>このページでは、メールアドレスを入力しなくてもパスキーでログインできます。パスキーを設定済みのデバイスをお使いの場合は、自動的に認証プロンプトが表示されます。</p>
+  </div>
+
   <%= form_for(resource, as: resource_name, url: session_path(resource_name), data: { 'authorize-passkey-target': 'form' }) do |f| %>
     <div class="field">
       <%= f.label :email %><br />
-      <%= f.email_field :email, autofocus: true, autocomplete: "email webauthn" %>
+      <%= f.email_field :email, autofocus: true, autocomplete: "email webauthn", placeholder: "メールアドレス (パスキー使用時は任意)" %>
     </div>
 
     <div class="field">
@@ -26,8 +30,12 @@
     <%= hidden_field_tag "passkey[credential]", nil, data: { 'authorize-passkey-target': 'credentialField' } %>
 
     <div class="actions">
-      <%= f.submit "Log in" %>
-      <%= f.button "Log in with a passkey", type: "button", data: { action: "authorize-passkey#signInWithPasskey" } %>
+      <%= f.submit "Log in", class: "standard-login-btn" %>
+      <%= f.button "Log in with a passkey", type: "button", class: "passkey-login-btn", data: { action: "authorize-passkey#signInWithPasskey" } %>
+    </div>
+    
+    <div class="passkey-explanation">
+      <p><small>パスキーを使うと、パスワードを入力せずに安全にログインできます。メールアドレスの入力も省略できます。</small></p>
     </div>
   <% end %>
 
@@ -48,6 +56,34 @@
     align-items: center;
     justify-content: center;
     z-index: 1000;
+  }
+  
+  .passkey-info {
+    background-color: #f0f8ff;
+    border: 1px solid #c0d8ff;
+    border-radius: 4px;
+    padding: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .passkey-login-btn {
+    background-color: #0066cc;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 10px;
+  }
+  
+  .passkey-login-btn:hover {
+    background-color: #0055aa;
+  }
+  
+  .passkey-explanation {
+    margin-top: 20px;
+    color: #666;
+  }
   }
   .qr-code-container {
     background: white;
