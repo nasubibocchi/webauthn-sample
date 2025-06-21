@@ -1,11 +1,14 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-# This model initially had no columns defined. If you add columns to the
-# model remove the "{}" from the fixture names and add the columns immediately
-# below each fixture, per the syntax in the comments below
-#
-one: {}
-# column: value
-#
-two: {}
-# column: value
+# パスワードレスユーザー（パスキーのみ使用）
+one:
+  email: user1@example.com
+  encrypted_password: ""
+  is_passwordless: true
+
+# 通常ユーザー（パスワード付き）
+two:
+  email: user2@example.com
+  # bcryptで暗号化された長さ60以上のパスワード文字列
+  encrypted_password: "$2a$12$K0ByB.6YI2/OYrB4fQOYLe6Tv0datUVf6VZ/2Lv6VbcXvGN6tu6ei"
+  is_passwordless: false
