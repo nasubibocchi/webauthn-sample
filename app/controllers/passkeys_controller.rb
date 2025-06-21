@@ -1,6 +1,6 @@
 # このコントローラーは、ログイン済みユーザーがマイページなどからアクセスして
 # パスキーの管理（追加・表示・削除）を行うための標準的なインターフェースを提供します。
-# 
+#
 # 注: 初回登録時のパスキー設定には Users::Passkeys::InitialPasskeysController を使用し、
 # パスワードレス登録のパスキー設定には Users::PasswordlessPasskeysController を使用します。
 # これにより、異なるユーザーフローに対して適切なエラーハンドリングとリダイレクトを実現しています。
@@ -33,4 +33,3 @@ class PasskeysController < ApplicationController
     redirect_to passkeys_path
   end
 end
-  

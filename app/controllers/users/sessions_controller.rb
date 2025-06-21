@@ -6,7 +6,7 @@ class Users::SessionsController < Devise::SessionsController
   def create
     # デバッグ: セッション全体の内容を記録
     Rails.logger.debug "Session contents: #{session.to_h.inspect}"
-    
+
     if authrized_passkey.present?
       self.resource = authrized_passkey.webauthn_user.user
       set_flash_message!(:notice, :signed_in)
@@ -18,7 +18,7 @@ class Users::SessionsController < Devise::SessionsController
       super
     end
   end
-  
+
   # GET /resource/sign_in
   # def new
   #   super
@@ -37,26 +37,26 @@ class Users::SessionsController < Devise::SessionsController
   # end
 
   private
-  
+
   def authrized_passkey
     return @authrized_passkey if defined?(@authrized_passkey)
 
     # パスキーパラメータがない場合はnil
     return @authrized_passkey = nil unless params[:passkey].present?
-    
+
     passkey_params = params.require(:passkey).permit(:credential)
     parsed_credential = JSON.parse(passkey_params[:credential]) rescue nil
     return @authrized_passkey = nil unless parsed_credential
 
     begin
       webauthn_credential = WebAuthn::Credential.from_get(parsed_credential)
-      
+
       # credential IDから対応するパスキーを検索
       passkey = Passkey.find_by(external_id: webauthn_credential.id)
       return @authrized_passkey = nil unless passkey
 
       stored_authentication_challenge = session[:current_webauthn_authentication_challenge]
-      
+
       if stored_authentication_challenge.blank?
         Rails.logger.error "Authentication challenge is missing from session"
         return @authrized_passkey = nil
@@ -70,12 +70,12 @@ class Users::SessionsController < Devise::SessionsController
           sign_count: passkey.sign_count,
           user_verification: "required"
         )
-        
+
         # 検証に成功したら sign_count を更新
         if webauthn_credential.sign_count > passkey.sign_count
           passkey.update(sign_count: webauthn_credential.sign_count)
         end
-        
+
         @authrized_passkey = passkey
       rescue WebAuthn::Error => e
         Rails.logger.error "WebAuthn verification error: #{e.message}"

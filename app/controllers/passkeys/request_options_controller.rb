@@ -8,13 +8,13 @@ class Passkeys::RequestOptionsController < ApplicationController
         # 従来のフローの実装
         user_params = params.require(:user).permit(:email)
         user = User.find_by!(email: user_params[:email])
-        
+
         if user.webauthn_user.nil?
           Rails.logger.info "User found but no webauthn_user exists: #{user_params[:email]}"
           render json: { error: "No WebAuthn identity for this user" }, status: :unprocessable_entity
           return
         end
-        
+
         if user.passkeys.blank?
           Rails.logger.info "User found but no passkeys registered: #{user_params[:email]}"
           render json: { error: "No passkeys registered for this email" }, status: :unprocessable_entity
@@ -26,7 +26,7 @@ class Passkeys::RequestOptionsController < ApplicationController
           user_verification: "required",
           allow: user.passkeys.pluck(:external_id)
         )
-        
+
         Rails.logger.info "WebAuthn request options generated for: #{user_params[:email]} with allowed credentials: #{user.passkeys.pluck(:external_id)}"
       else
         # 新しい discoverable credentials フロー
@@ -34,7 +34,7 @@ class Passkeys::RequestOptionsController < ApplicationController
         request_options = WebAuthn::Credential.options_for_get(
           user_verification: "required"
         )
-        
+
         Rails.logger.info "WebAuthn request options generated for discoverable credentials"
       end
 
