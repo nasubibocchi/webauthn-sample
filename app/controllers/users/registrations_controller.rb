@@ -1,5 +1,12 @@
 # frozen_string_literal: true
 
+# このコントローラーは、Deviseの標準登録プロセスをカスタマイズし、
+# 通常のパスワード登録が完了した直後にパスキー設定画面へ誘導するために使用します。
+#
+# デフォルトのDeviseフローをオーバーライドして、登録後の遷移先を
+# Users::Passkeys::InitialPasskeysController（パスキー初期設定画面）に変更しています。
+# これにより、ユーザーエクスペリエンスを向上させ、すべてのユーザーが
+# パスキーを登録する可能性を高めています。
 class Users::RegistrationsController < Devise::RegistrationsController
   # before_action :configure_sign_up_params, only: [:create]
   # before_action :configure_account_update_params, only: [:update]
@@ -10,9 +17,17 @@ class Users::RegistrationsController < Devise::RegistrationsController
   # end
 
   # POST /resource
-  # def create
-  #   super
-  # end
+  def create
+    super do |resource|
+      # Only redirect to passkey setup if registration was successful
+      if resource.persisted?
+        # Store the destination so we can redirect after passkey setup
+        session[:user_return_to] = after_sign_in_path_for(resource)
+        # Prevent default redirect by Devise
+        return respond_with(resource, location: initial_passkey_path)
+      end
+    end
+  end
 
   # GET /resource/edit
   # def edit
@@ -38,7 +53,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
   #   super
   # end
 
-  # protected
+  protected
 
   # If you have extra params to permit, append them to the sanitizer.
   # def configure_sign_up_params
@@ -52,7 +67,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
 
   # The path used after sign up.
   # def after_sign_up_path_for(resource)
-  #   super(resource)
+  #   initial_passkey_path
   # end
 
   # The path used after sign up for inactive accounts.
