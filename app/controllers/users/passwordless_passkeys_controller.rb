@@ -1,3 +1,14 @@
+# このコントローラーは、パスワードレス登録フローの一部として、
+# メールアドレスのみで仮登録したユーザーにパスキーを設定するための専用処理を提供します。
+#
+# PasskeysController および InitialPasskeysController とは以下の点で異なります：
+# 1. ユーザーは仮登録状態（パスワードレス）でまだ完全にログインしていない
+# 2. パスキー登録が完了するまでアカウントが有効にならない
+# 3. セッション管理が特殊（passwordless_user_id等を使用）
+# 4. 認証要件が異なる（authenticate_user!をスキップ）
+#
+# この実装により、パスワード認証とパスワードレス認証の2つの登録フローを
+# 適切に分離しつつ、どちらもパスキーによる認証を実現しています。
 class Users::PasswordlessPasskeysController < ApplicationController
   skip_before_action :authenticate_user!, raise: false
   before_action :ensure_valid_registration_session
