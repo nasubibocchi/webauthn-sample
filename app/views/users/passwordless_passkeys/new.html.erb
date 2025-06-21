@@ -1,0 +1,17 @@
+<h1>パスキーを設定する</h1>
+
+<p>パスキーを設定して、安全でパスワードレスなログインを有効にしましょう。</p>
+
+<%= tag.div data: {
+   controller: "passwordless-passkey",
+   "passwordless-passkey-creation-options-url-value": passwordless_passkey_creation_options_path
+ } do %>
+  <%= form_with url: passwordless_passkey_path, model: Passkey.new, method: :post, data: {
+    'passwordless-passkey-target': 'form',
+    action: 'passwordless-passkey#submit',
+  } do |f| %>
+    <%= f.hidden_field :credential, data: { 'passwordless-passkey-target': 'credentialField' } %>
+    <%= f.text_field :label, placeholder: 'デバイス名', required: true, value: @user.email %>
+    <%= f.submit 'パスキーを設定する' %>
+  <% end %>
+<% end %>

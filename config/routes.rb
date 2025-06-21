@@ -7,10 +7,24 @@ Rails.application.routes.draw do
         resources :creation_options, only: [:create], module: :passkeys
       end
     end
+    
+    # Initial passkey setup after signup
+    get 'passkey_setup', to: 'users/passkeys/initial_passkeys#show', as: :initial_passkey
+    post 'passkey_setup', to: 'users/passkeys/initial_passkeys#create', as: :create_initial_passkey
   end
 
+  # パスワードレス登録フロー
+  get 'passwordless_sign_up', to: 'users/passwordless_registrations#new', as: :new_passwordless_registration
+  post 'passwordless_sign_up', to: 'users/passwordless_registrations#create', as: :passwordless_sign_up
+  get 'passwordless_passkey', to: 'users/passwordless_passkeys#new', as: :new_passwordless_passkey
+  post 'passwordless_passkey', to: 'users/passwordless_passkeys#create', as: :passwordless_passkey
+  get 'passwordless_passkey/creation_options', to: 'users/passwordless_passkeys#creation_options', as: :passwordless_passkey_creation_options
+
   get "my_pages/show"
-  devise_for :users, controllers: { sessions: 'users/sessions' }
+  devise_for :users, controllers: { 
+    sessions: 'users/sessions',
+    registrations: 'users/registrations'
+  }
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.

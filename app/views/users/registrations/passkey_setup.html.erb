@@ -1,0 +1,21 @@
+<h1>パスキーを設定する</h1>
+
+<p>安全でパスワードレスなログインのために、パスキーを設定して登録を完了してください。</p>
+
+<%= tag.div data: {
+   controller: "new-passkey",
+   "new-passkey-creation-options-url-value": creation_options_path
+ } do %>
+  <%= form_with url: create_initial_passkey_path, model: Passkey.new, method: :post, data: {
+    'new-passkey-target': 'form',
+    action: 'new-passkey#submit',
+  } do |f| %>
+    <%= f.hidden_field :credential, data: { 'new-passkey-target': 'credentialField' } %>
+    <%= f.text_field :label, placeholder: 'デバイス名', required: true, value: current_user.email %>
+    <%= f.submit 'パスキーを設定する' %>
+  <% end %>
+<% end %>
+
+<div class="mt-4">
+  <%= link_to "今はスキップする", after_sign_in_path_for(current_user), class: "text-sm text-blue-600" %>
+</div>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_06_13_075237) do
+ActiveRecord::Schema[7.2].define(version: 2025_06_20_053153) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -34,8 +34,10 @@ ActiveRecord::Schema[7.2].define(version: 2025_06_13_075237) do
     t.datetime "remember_created_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "is_passwordless", default: false, null: false
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
+    t.check_constraint "length(encrypted_password::text) >= 60 OR is_passwordless = true", name: "ensure_strong_password_unless_passwordless"
   end
 
   create_table "webauthn_users", force: :cascade do |t|

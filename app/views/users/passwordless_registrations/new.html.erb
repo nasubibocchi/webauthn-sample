@@ -1,0 +1,30 @@
+<h1>パスワードレス登録</h1>
+
+<p>メールアドレスを入力して、パスキーで安全なログインを設定しましょう。</p>
+
+<%= form_with model: @user, url: passwordless_sign_up_path, scope: :user, data: { turbo: false } do |f| %>
+  <% if @user.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@user.errors.count, "error") %> によりユーザーを登録できませんでした:</h2>
+      <ul>
+        <% @user.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :email, "メールアドレス" %><br />
+    <%= f.email_field :email, autofocus: true, autocomplete: "email" %>
+  </div>
+
+  <div class="actions">
+    <%= f.submit "続ける" %>
+  </div>
+<% end %>
+
+<div class="mt-4">
+  <%= link_to "ログイン", new_user_session_path %><br />
+  <%= link_to "通常の登録（パスワードあり）", new_user_registration_path %><br />
+</div>

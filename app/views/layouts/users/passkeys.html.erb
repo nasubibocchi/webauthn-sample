@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>WebAuthn サンプル - パスキー登録</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body>
+    <div class="container mx-auto px-4 py-8 max-w-md">
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <%= yield %>
+      </div>
+    </div>
+    
+    <% if notice %>
+      <div class="flash notice"><%= notice %></div>
+    <% end %>
+    <% if alert %>
+      <div class="flash alert"><%= alert %></div>
+    <% end %>
+  </body>
+</html>

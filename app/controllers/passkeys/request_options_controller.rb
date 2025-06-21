@@ -9,6 +9,12 @@ class Passkeys::RequestOptionsController < ApplicationController
         user_params = params.require(:user).permit(:email)
         user = User.find_by!(email: user_params[:email])
         
+        if user.webauthn_user.nil?
+          Rails.logger.info "User found but no webauthn_user exists: #{user_params[:email]}"
+          render json: { error: "No WebAuthn identity for this user" }, status: :unprocessable_entity
+          return
+        end
+        
         if user.passkeys.blank?
           Rails.logger.info "User found but no passkeys registered: #{user_params[:email]}"
           render json: { error: "No passkeys registered for this email" }, status: :unprocessable_entity
@@ -21,7 +27,7 @@ class Passkeys::RequestOptionsController < ApplicationController
           allow: user.passkeys.pluck(:external_id)
         )
         
-        Rails.logger.info "WebAuthn request options generated for: #{user_params[:email]}"
+        Rails.logger.info "WebAuthn request options generated for: #{user_params[:email]} with allowed credentials: #{user.passkeys.pluck(:external_id)}"
       else
         # 新しい discoverable credentials フロー
         # allowパラメータを指定せずに、すべてのパスキーを許可する
