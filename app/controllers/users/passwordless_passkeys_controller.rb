@@ -22,6 +22,7 @@ class Users::PasswordlessPasskeysController < ApplicationController
   # パスキー登録用のオプション生成
   def creation_options
     # 登録に関する追加のセキュリティ設定
+    # https://github.com/cedarcode/webauthn-ruby/blob/b48108d053e4a0b8e6edf474d72b113a81426a01/lib/webauthn/public_key_credential/creation_options.rb#L10
     creation_options = WebAuthn::Credential.options_for_create(
       user: {
         id: find_or_create_webauthn_id(@user),
