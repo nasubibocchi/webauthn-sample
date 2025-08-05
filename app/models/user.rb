@@ -8,9 +8,11 @@ class User < ApplicationRecord
   delegate :passkeys, to: :webauthn_user, allow_nil: true
 
   # パスワードレス登録を可能にする
+  # パスワードレスなuserレコード作成 && パスキー未登録状態ではまだis_passwordlessをtrueにしたくない
   attr_accessor :passwordless
 
   # パスワードレス登録かどうかを判定するフラグと登録方法を保存
+  # createが完了したらis_passwordlessをtrueにする
   after_create :mark_passwordless_user, if: -> { passwordless }
 
   # パスワードレス登録の場合のみパスワードチェックをスキップ
