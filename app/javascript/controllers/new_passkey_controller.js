@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus";
+// https://github.com/github/webauthn-json/tree/main/browser-ponyfill
 import {
   create,
   parseCreationOptionsFromJSON
