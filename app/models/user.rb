@@ -25,7 +25,7 @@ class User < ApplicationRecord
   # このユーザーがパスキー専用ユーザーかどうかを確認
   def passwordless_user?
     # パスキーが登録されており、かつ is_passwordless フラグが true
-    passkeys.exists? && self[:is_passwordless]
+    passkeys.exists? && is_passwordless
   end
 
   private
