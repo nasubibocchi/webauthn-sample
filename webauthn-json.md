@@ -13,7 +13,6 @@
   3. パスキー認証: app/javascript/controllers/authorize_passkey_controller.js
 
   - `window.PublicKeyCredential` - WebAuthnサポート確認
-  - `window.PublicKeyCredential` - WebAuthnサポート確認
   - `PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()` - プラットフォーム認証器の可用性確認
   - `PublicKeyCredential.isConditionalMediationAvailable()` - 条件付きメディエーション確認
   - `parseRequestOptionsFromJSON()` - パスキー認証オプションの解析
