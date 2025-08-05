@@ -119,10 +119,12 @@ rails s
 
 ```javascript
 // Conditional MediaationによるパスキーUI自動表示の実装例
+// 参考：app/javascript/controllers/passwordless_passkey_controller.js
 if (PublicKeyCredential.isConditionalMediationAvailable) {
   const isCMA = await PublicKeyCredential.isConditionalMediationAvailable();
   if (isCMA) {
     // パスキー認証の開始
+    // オプションパラメータはサーバー側（controller）からjson形式で受け取る
     const credentialRequestOptions = parseRequestOptionsFromJSON({ publicKey: requestOption });
     credentialRequestOptions['mediation'] = 'conditional';
     const credential = await get(credentialRequestOptions);
