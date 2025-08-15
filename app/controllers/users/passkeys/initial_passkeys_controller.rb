@@ -20,7 +20,7 @@ class Users::Passkeys::InitialPasskeysController < ApplicationController
     stored_registration_challenge = session[:current_webauthn_registration_challenge]
     parsed_credential = JSON.parse(passkey_params[:credential]) rescue nil
     webauthn_credential = WebAuthn::Credential.from_create(parsed_credential)
-    webauthn_credential.verify(stored_registration_challenge, user_verification: true)
+    webauthn_credential.verify(stored_registration_challenge, user_verification: "preferred")
 
     current_user.passkeys.create!(
       label: passkey_params[:label],

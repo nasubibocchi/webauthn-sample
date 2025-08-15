@@ -23,7 +23,7 @@ class Passkeys::RequestOptionsController < ApplicationController
 
         # 特定ユーザーのパスキーのみを許可
         request_options = WebAuthn::Credential.options_for_get(
-          user_verification: "required",
+          user_verification: "preferred",
           allow: user.passkeys.pluck(:external_id)
         )
 
@@ -32,7 +32,7 @@ class Passkeys::RequestOptionsController < ApplicationController
         # 新しい discoverable credentials フロー
         # allowパラメータを指定せずに、すべてのパスキーを許可する
         request_options = WebAuthn::Credential.options_for_get(
-          user_verification: "required"
+          user_verification: "preferred"
         )
 
         Rails.logger.info "WebAuthn request options generated for discoverable credentials"

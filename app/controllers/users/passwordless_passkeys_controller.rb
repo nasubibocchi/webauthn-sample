@@ -64,7 +64,7 @@ class Users::PasswordlessPasskeysController < ApplicationController
 
     begin
       webauthn_credential = WebAuthn::Credential.from_create(parsed_credential)
-      webauthn_credential.verify(stored_registration_challenge, user_verification: true)
+      webauthn_credential.verify(stored_registration_challenge, user_verification: "preferred")
 
       # パスキーの登録とユーザーのパスワードレス化を1つのトランザクションで実行
       ActiveRecord::Base.transaction do

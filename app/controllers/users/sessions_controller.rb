@@ -68,7 +68,7 @@ class Users::SessionsController < Devise::SessionsController
           stored_authentication_challenge,
           public_key: passkey.public_key,
           sign_count: passkey.sign_count,
-          user_verification: "required"
+          user_verification: "preferred" # or "required" based on your security needs
         )
 
         # 検証に成功したら sign_count を更新

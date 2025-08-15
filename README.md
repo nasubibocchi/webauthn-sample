@@ -143,7 +143,7 @@ if (PublicKeyCredential.isConditionalMediationAvailable) {
 ```ruby
 # Discoverable Credentialsのためのチャレンジ生成
 request_options = WebAuthn::Credential.options_for_get(
-  user_verification: "required"
+  user_verification: "preferred"
   # allowパラメータを指定しない = 全てのパスキーを許可
 )
 ```
