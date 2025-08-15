@@ -34,7 +34,7 @@ class Users::PasswordlessPasskeysController < ApplicationController
         resident_key: "required",
         require_resident_key: true,
         # ユーザー検証を常に要求 (例: 生体認証、PIN)
-        user_verification: "required"
+        user_verification: "preferred"
         # 一部のブラウザでは、プラットフォーム認証器のみを要求
         # authenticator_attachment: "platform"
       },

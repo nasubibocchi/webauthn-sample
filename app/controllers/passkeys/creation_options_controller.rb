@@ -10,7 +10,7 @@ class Passkeys::CreationOptionsController < ApplicationController
       authenticator_selection: {
         resident_key: "required", # 2023年11月現在、Android Chrome でパスキーを使うには residentKey が必須
         require_resident_key: true,
-        user_verification: "required" # 認証器でのユーザー認証を要求する
+        user_verification: "preferred" # 認証器でのユーザー認証を要求する
       }
     )
 
