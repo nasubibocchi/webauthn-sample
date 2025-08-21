@@ -45,10 +45,10 @@ class Users::SessionsController < Devise::SessionsController
     # メールアドレスからユーザーを検索
     email = params.dig(:user, :email)
     return false if email.blank?
-    
+
     user = User.find_by(email: email)
     return false unless user
-    
+
     # パスワードレスユーザーかどうかをチェック
     user.is_passwordless?
   end
