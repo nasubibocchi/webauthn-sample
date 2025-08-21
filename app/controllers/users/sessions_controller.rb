@@ -14,6 +14,9 @@ class Users::SessionsController < Devise::SessionsController
       authrized_passkey.update!(last_used_at: Time.current)
       yield resource if block_given?
       respond_with resource, location: after_sign_in_path_for(resource)
+    elsif passwordless_user_attempting_password_login?
+      set_flash_message!(:alert, :passwordless_user_cannot_use_password)
+      redirect_to new_user_session_path
     else
       super
     end
@@ -37,6 +40,18 @@ class Users::SessionsController < Devise::SessionsController
   # end
 
   private
+
+  def passwordless_user_attempting_password_login?
+    # メールアドレスからユーザーを検索
+    email = params.dig(:user, :email)
+    return false if email.blank?
+    
+    user = User.find_by(email: email)
+    return false unless user
+    
+    # パスワードレスユーザーかどうかをチェック
+    user.is_passwordless?
+  end
 
   def authrized_passkey
     return @authrized_passkey if defined?(@authrized_passkey)
