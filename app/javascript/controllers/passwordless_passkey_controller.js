@@ -1,15 +1,60 @@
 import { Controller } from "@hotwired/stimulus";
-// https://github.com/github/webauthn-json/tree/main/browser-ponyfill
-import {
-  create,
-  parseCreationOptionsFromJSON
-} from "@github/webauthn-json/browser-ponyfill";
 
 export default class extends Controller {
   static targets = ["form", "credentialField"];
   static values = {
     creationOptionsUrl: String
   };
+
+  parseCreationOptionsFromJSON(options) {
+    const publicKey = {
+      ...options.publicKey,
+      challenge: this.base64urlToArrayBuffer(options.publicKey.challenge),
+      user: {
+        ...options.publicKey.user,
+        id: this.base64urlToArrayBuffer(options.publicKey.user.id)
+      }
+    };
+
+    if (options.publicKey.excludeCredentials) {
+      publicKey.excludeCredentials = options.publicKey.excludeCredentials.map(cred => ({
+        ...cred,
+        id: this.base64urlToArrayBuffer(cred.id)
+      }));
+    }
+
+    return { publicKey };
+  }
+
+  credentialToJSON(credential) {
+    return {
+      id: credential.id,
+      rawId: this.arrayBufferToBase64url(credential.rawId),
+      response: {
+        attestationObject: this.arrayBufferToBase64url(credential.response.attestationObject),
+        clientDataJSON: this.arrayBufferToBase64url(credential.response.clientDataJSON)
+      },
+      type: credential.type
+    };
+  }
+
+  base64urlToArrayBuffer(base64url) {
+    const base64 = base64url.replace(/-/g, '+').replace(/_/g, '/');
+    const padded = base64.padEnd(base64.length + (4 - base64.length % 4) % 4, '=');
+    const binary = atob(padded);
+    const buffer = new ArrayBuffer(binary.length);
+    const view = new Uint8Array(buffer);
+    for (let i = 0; i < binary.length; i++) {
+      view[i] = binary.charCodeAt(i);
+    }
+    return buffer;
+  }
+
+  arrayBufferToBase64url(buffer) {
+    const binary = String.fromCharCode(...new Uint8Array(buffer));
+    const base64 = btoa(binary);
+    return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+  }
 
   connect() {
     // コントローラーが接続されたら自動的にパスキー作成を開始
@@ -32,9 +77,9 @@ export default class extends Controller {
       .then(async creationOption => {
         console.log(creationOption);
         // ここに成功時の処理を書く
-        const credentialCreationOptions = parseCreationOptionsFromJSON({ publicKey: creationOption });
-        const credentialCreationResponse = await create(credentialCreationOptions);
-        this.credentialFieldTarget.value = JSON.stringify(credentialCreationResponse);
+        const credentialCreationOptions = this.parseCreationOptionsFromJSON({ publicKey: creationOption });
+        const credentialCreationResponse = await navigator.credentials.create(credentialCreationOptions);
+        this.credentialFieldTarget.value = JSON.stringify(this.credentialToJSON(credentialCreationResponse));
         this.formTarget.submit();
       })
       .catch(error => {

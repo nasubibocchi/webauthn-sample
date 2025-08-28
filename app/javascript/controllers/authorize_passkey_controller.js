@@ -1,15 +1,58 @@
 import { Controller } from "@hotwired/stimulus";
-// https://github.com/github/webauthn-json/tree/main/browser-ponyfill
-import {
-  get,
-  parseRequestOptionsFromJSON
-} from "@github/webauthn-json/browser-ponyfill";
 
 export default class extends Controller {
   static targets = ["form", "credentialField"];
   static values = {
     requestOptionsUrl: String
   };
+
+  parseRequestOptionsFromJSON(options) {
+    const publicKey = {
+      ...options.publicKey,
+      challenge: this.base64urlToArrayBuffer(options.publicKey.challenge)
+    };
+
+    if (options.publicKey.allowCredentials) {
+      publicKey.allowCredentials = options.publicKey.allowCredentials.map(cred => ({
+        ...cred,
+        id: this.base64urlToArrayBuffer(cred.id)
+      }));
+    }
+
+    return { publicKey };
+  }
+
+  assertionToJSON(assertion) {
+    return {
+      id: assertion.id,
+      rawId: this.arrayBufferToBase64url(assertion.rawId),
+      response: {
+        authenticatorData: this.arrayBufferToBase64url(assertion.response.authenticatorData),
+        clientDataJSON: this.arrayBufferToBase64url(assertion.response.clientDataJSON),
+        signature: this.arrayBufferToBase64url(assertion.response.signature),
+        userHandle: assertion.response.userHandle ? this.arrayBufferToBase64url(assertion.response.userHandle) : null
+      },
+      type: assertion.type
+    };
+  }
+
+  base64urlToArrayBuffer(base64url) {
+    const base64 = base64url.replace(/-/g, '+').replace(/_/g, '/');
+    const padded = base64.padEnd(base64.length + (4 - base64.length % 4) % 4, '=');
+    const binary = atob(padded);
+    const buffer = new ArrayBuffer(binary.length);
+    const view = new Uint8Array(buffer);
+    for (let i = 0; i < binary.length; i++) {
+      view[i] = binary.charCodeAt(i);
+    }
+    return buffer;
+  }
+
+  arrayBufferToBase64url(buffer) {
+    const binary = String.fromCharCode(...new Uint8Array(buffer));
+    const base64 = btoa(binary);
+    return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+  }
   
   isWebAuthnSupported() {
     return window.PublicKeyCredential !== undefined;
@@ -70,7 +113,7 @@ export default class extends Controller {
         if (requestOption.error) {
           return;
         }
-        const credentialRequestOptions = parseRequestOptionsFromJSON({ publicKey: requestOption });
+        const credentialRequestOptions = this.parseRequestOptionsFromJSON({ publicKey: requestOption });
         if (isCMA) {        // https://w3c.github.io/webappsec-credential-management/#mediation-requirements
           credentialRequestOptions['mediation'] = 'conditional';
           
@@ -82,10 +125,10 @@ export default class extends Controller {
         }
         
         try {
-          const credentialRequestResponse = await get(credentialRequestOptions);
+          const credentialRequestResponse = await navigator.credentials.get(credentialRequestOptions);
           
           if (credentialRequestResponse) {
-            this.credentialFieldTarget.value = JSON.stringify(credentialRequestResponse);
+            this.credentialFieldTarget.value = JSON.stringify(this.assertionToJSON(credentialRequestResponse));
             this.formTarget.submit();
           }
         } catch (error) {
